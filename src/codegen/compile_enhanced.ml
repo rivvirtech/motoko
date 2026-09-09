@@ -8074,6 +8074,22 @@ module Serialization = struct
       (match mode with
       | Candid -> None
       | Persistence -> Some 129l)
+    (* Candid has no 128- or 256-bit natural, so on the wire these are `nat`, which is what
+       the ecosystem already uses for 256-bit quantities (ICRC ledger amounts, and so on)
+       and what mo_to_idl declares in the .did.
+
+       For PERSISTENCE they must be codes of their own, and this is not cosmetic: if they
+       shared `nat`'s code, then changing a `stable var x : Nat` to `stable var x : Nat256`
+       across an upgrade would pass the memory-compatibility check and then read a bignum
+       pointer as a limb blob. Distinct codes turn that into the upgrade error it is. *)
+    | Prim Nat128 ->
+      (match mode with
+      | Candid -> Some 3l
+      | Persistence -> Some 132l)
+    | Prim Nat256 ->
+      (match mode with
+      | Candid -> Some 3l
+      | Persistence -> Some 133l)
     | _ -> None
 
   (* some constants, also see rts/idl.c *)
@@ -8085,9 +8101,17 @@ module Serialization = struct
   let idl_service   = -23l
   let idl_alias     = 1l (* see Note [mutable stable values] *)
 
-  (* only used for memory compatibility checks *)
+  (* only used for memory compatibility checks.
+
+     NOTE THESE SHARE ONE CODE SPACE WITH to_idl_prim ABOVE, which returns the codes
+     POSITIVE and has them negated at the point of emission (`Int32.neg i`). So `Some 130l`
+     there and `idl_tuple = -130l` here are THE SAME CODE. Picking 130 for a new primitive
+     put Nat128 on the wire as a tuple, and the memory-compatibility check compared them
+     against each other. Next free pair after these is 134/135; keep this list and
+     rts/motoko-rts/src/idl.rs in step. *)
   let idl_tuple     = -130l
   let idl_weak     = -131l (* UNUSED FOR NOW, might need eventually *)
+  (* -132 / -133 are Nat128 / Nat256, see to_idl_prim *)
 
 
   (* TODO: use record *)
@@ -8377,6 +8401,9 @@ module Serialization = struct
       (* Now the actual type-dependent code *)
       begin match t with
       | Prim Nat -> inc_data_size (get_x ^^ BigNum.compile_data_size_unsigned env)
+      | Prim (Nat128 | Nat256 as pty) ->
+        inc_data_size (get_x ^^ Wide.to_bignum env (Wide.width_of_typ pty) ^^
+                       BigNum.compile_data_size_unsigned env)
       | Prim Int -> inc_data_size (get_x ^^ BigNum.compile_data_size_signed env)
       | Prim (Int8|Nat8) -> inc_data_size compile_unboxed_one
       | Prim (Int16|Nat16) -> inc_data_size (compile_unboxed_const 2L)
@@ -8536,6 +8563,12 @@ module Serialization = struct
       begin match t with
       | Prim Nat ->
         write_bignum_leb env get_data_buf get_x
+      | Prim (Nat128 | Nat256 as pty) ->
+        (* The candid path goes through a bignum, unlike the arithmetic, which never does.
+           That is a deliberate split: serialisation is I/O, it already allocates buffers,
+           and reusing the LEB writer that every other numeric type uses is worth more here
+           than saving one allocation. *)
+        write_bignum_leb env get_data_buf (get_x ^^ Wide.to_bignum env (Wide.width_of_typ pty))
       | Prim Int ->
         write_bignum_sleb env get_data_buf get_x
       | Prim Float32 ->
@@ -9099,6 +9132,15 @@ module Serialization = struct
         with_prim_typ t
         begin
           BigNum.compile_load_from_data_buf env get_data_buf false
+        end
+      | Prim (Nat128 | Nat256 as pty) ->
+        with_prim_typ t
+        begin
+          (* A caller can send any `nat`, so a value too large for the width traps here.
+             That is unavoidable for a fixed-width type behind an unbounded wire type, and
+             is the same contract as every other narrowing conversion. *)
+          BigNum.compile_load_from_data_buf env get_data_buf false ^^
+          Wide.of_bignum env (Wide.width_of_typ pty)
         end
       | Prim Int ->
         (* Subtyping with nat *)

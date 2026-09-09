@@ -68,6 +68,14 @@ const IDL_EXT_blob: i32 = -129;
 const IDL_EXT_tuple: i32 = -130;
 #[enhanced_orthogonal_persistence]
 const IDL_EXT_weak: i32 = -131;
+// The fixed-width naturals wider than a machine word. They are `nat` in pure Candid, which
+// has nothing wider than nat64, but persistence needs them distinct: sharing nat's code
+// would let an upgrade turn a `stable var x : Nat` into a `stable var x : Nat256` and then
+// read a bignum pointer as a limb blob.
+#[enhanced_orthogonal_persistence]
+const IDL_EXT_nat128: i32 = -132;
+#[enhanced_orthogonal_persistence]
+const IDL_EXT_nat256: i32 = -133;
 
 unsafe fn leb128_decode(buf: *mut Buf) -> u32 {
     let value = crate::leb128::leb128_decode(buf);
@@ -107,7 +115,12 @@ unsafe fn is_primitive_type(mode: CompatibilityMode, ty: i32) -> bool {
         CompatibilityMode::PureCandid => false,
         CompatibilityMode::CandidishStabilization => ty == IDL_EXT_region,
         #[cfg(feature = "enhanced_orthogonal_persistence")]
-        CompatibilityMode::MemoryCompatibility => ty == IDL_EXT_region || ty == IDL_EXT_blob,
+        CompatibilityMode::MemoryCompatibility => {
+            ty == IDL_EXT_region
+                || ty == IDL_EXT_blob
+                || ty == IDL_EXT_nat128
+                || ty == IDL_EXT_nat256
+        }
     }
 }
 
