@@ -10544,6 +10544,10 @@ let const_lit_of_lit : Ir.lit -> Const.lit = function
   | Nat16Lit n    -> Const.Vanilla (TaggedSmallWord.vanilla_lit Type.Nat16 (Numerics.Nat16.to_int n))
   | Int32Lit n    -> Const.Word32 (Type.Int32, (Big_int.int32_of_big_int (Numerics.Int_32.to_big_int n)))
   | Nat32Lit n    -> Const.Word32 (Type.Nat32, (Big_int.int32_of_big_int (nat32_to_int32 (Numerics.Nat32.to_big_int n))))
+  (* Wide integers are ENHANCED-persistence only by design (the typer rejects them under
+     --legacy-persistence), so these arms are unreachable rather than unimplemented. *)
+  | Nat128Lit _ | Nat256Lit _ ->
+    raise (Invalid_argument "wide integers require enhanced orthogonal persistence")
   | Int64Lit n    -> Const.Word64 (Type.Int64, (Big_int.int64_of_big_int (Numerics.Int_64.to_big_int n)))
   | Nat64Lit n    -> Const.Word64 (Type.Nat64, (Big_int.int64_of_big_int (nat64_to_int64 (Numerics.Nat64.to_big_int n))))
   | CharLit c     -> Const.Vanilla (TaggedSmallWord.vanilla_lit Type.Char c)
@@ -13073,6 +13077,8 @@ and compile_lit_pat env l =
   | Nat8Lit _ ->
     compile_lit_as env SR.Vanilla l ^^
     compile_eq env Type.(Prim Nat8)
+  | Nat128Lit _ | Nat256Lit _ ->
+    raise (Invalid_argument "wide integers require enhanced orthogonal persistence")
   | Nat16Lit _ ->
     compile_lit_as env SR.Vanilla l ^^
     compile_eq env Type.(Prim Nat16)
