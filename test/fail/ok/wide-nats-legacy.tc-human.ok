@@ -1,0 +1,12 @@
+error[M0271]: type Nat256 requires enhanced orthogonal persistence and is not available with --legacy-persistence
+    ┌─ wide-nats-legacy.mo:4:5
+  4 │  let x : Nat256 = 1;
+    │      ^^^^^^^^^^ 
+error[M0271]: type Nat128 requires enhanced orthogonal persistence and is not available with --legacy-persistence
+    ┌─ wide-nats-legacy.mo:5:5
+  5 │  let y : Nat128 = 2;
+    │      ^^^^^^^^^^ 
+error[M0271]: type Nat256 requires enhanced orthogonal persistence and is not available with --legacy-persistence
+    ┌─ wide-nats-legacy.mo:6:31
+  6 │  func f(n : Nat256) : Nat256 = n;
+    │                                ^ 
