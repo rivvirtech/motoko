@@ -1,6 +1,6 @@
 --- blob-bounds.run
 +++ blob-bounds.run-low
-@@ -1,80 +1 @@
+@@ -1,86 +1 @@
 -blob-bounds.mo:1.17-1.18: internal error, Invalid_argument("index out of bounds")
 -
 -Last environment:
@@ -40,10 +40,14 @@
 -@mut_array_put = <func>
 -@mut_array_size = <func>
 -@mut_array_vals = <func>
+-@nat128ToNat = <func>
 -@nat16ToNat = <func>
+-@nat256ToNat = <func>
 -@nat32ToNat = <func>
 -@nat64ToNat = <func>
 -@nat8ToNat = <func>
+-@natToNat128 = <func>
+-@natToNat256 = <func>
 -@new_async = <func>
 -@nextExpiration = <func>
 -@prune = <func>
@@ -66,7 +70,9 @@
 -@text_of_Int64 = <func>
 -@text_of_Int8 = <func>
 -@text_of_Nat = <func>
+-@text_of_Nat128 = <func>
 -@text_of_Nat16 = <func>
+-@text_of_Nat256 = <func>
 -@text_of_Nat32 = <func>
 -@text_of_Nat64 = <func>
 -@text_of_Nat8 = <func>
