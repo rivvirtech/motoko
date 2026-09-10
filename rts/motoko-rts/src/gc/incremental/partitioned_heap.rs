@@ -77,16 +77,38 @@ use super::{
 ///    due to the increased frequency of large object handling.
 /// -> Large partitions are a waste for small programs, since the WASM memory is
 ///    allocated in that granularity and GC is then triggered later.
+/// The `compact_partitions` feature selects a much smaller partition, for deployments where
+/// the second half of the comment above dominates: a heap that never approaches one standard
+/// partition pays for a whole one anyway, because Wasm memory is allocated in that
+/// granularity and the collector does not run until a partition fills. That is a rounding
+/// error for a canister on the IC, where memory is committed lazily, and it is not one for a
+/// host running many small instances in a single process, where the memory is real and
+/// per-instance. Measured on such a host: a leaf actor's committed memory falls from 4.06 MB
+/// to 0.31 MB, and a churning actor collects early instead of committing tens of MB first.
+///
+/// The cost is the one the comment above predicts -- more frequent large-object handling --
+/// plus a lower ceiling on a single contiguous allocation, which is
+/// `(PARTITIONS_PER_TABLE - 1) * PARTITION_SIZE`: 254 MB rather than 8 GB. Both are
+/// acceptable for the small-instance case and neither is for a general-purpose build, which
+/// is why this is a feature and not a new default.
 #[enhanced_orthogonal_persistence]
-pub const PARTITION_SIZE: usize = 64 * 1024 * 1024;
+pub const PARTITION_SIZE: usize = if cfg!(feature = "compact_partitions") {
+    2 * 1024 * 1024
+} else {
+    64 * 1024 * 1024
+};
 
 #[classical_persistence]
-pub const PARTITION_SIZE: usize = 32 * 1024 * 1024;
+pub const PARTITION_SIZE: usize = if cfg!(feature = "compact_partitions") {
+    2 * 1024 * 1024
+} else {
+    32 * 1024 * 1024
+};
 
 /// Number of entries per partition table.
 /// Tables are linearly linked, allowing the usage of the entire address space.
 /// Maximum contiguous space is `(PARTITION_PER_TABLE - 1) * PARTITION_SIZE`.
-const PARTITIONS_PER_TABLE: usize = 128; // 8 GB of space for 64 MB partitions and 4 GB for 32 MB partitions.
+const PARTITIONS_PER_TABLE: usize = 128; // 8 GB of space for 64 MB partitions, 4 GB for 32 MB partitions and 256 MB for the compact 2 MB ones.
 
 /// Maximum number of partitions in the memory.
 /// For simplicity, the last partition is left unused, to avoid a numeric overflow when

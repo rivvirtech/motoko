@@ -1,2 +1,3 @@
 mo-rts*.wasm
 _build
+motoko-rts/target-compact

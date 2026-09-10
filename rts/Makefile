@@ -228,6 +228,12 @@ RTS_RELEASE_TARGET_64=motoko-rts/target/wasm64-none-shared/release/libmotoko_rts
 RTS_RUST_WASM_64_A=_build/wasm64/libmotoko_rts.a
 RTS_RUST_DEBUG_WASM_64_A=_build/wasm64/libmotoko_rts_debug.a
 
+# The same runtime with `compact_partitions`. Its own CARGO_TARGET_DIR: the feature set differs,
+# so sharing one would make the two artifacts invalidate each other's cache on every alternation.
+RTS_COMPACT_BUILD_64=cd motoko-rts && RUSTFLAGS="${RTS_RELEASE_COMPILE_FLAGS}" CARGO_TARGET_DIR=target-compact cargo build --target wasm64-none-shared.json $(NIGHTLY_RELEASE_CARGO_OPTIONS) --features enhanced_orthogonal_persistence,compact_partitions
+RTS_COMPACT_TARGET_64=motoko-rts/target-compact/wasm64-none-shared/release/libmotoko_rts.a
+RTS_RUST_COMPACT_WASM_64_A=_build/wasm64/libmotoko_rts_compact.a
+
 $(RTS_RUST_WASM_64_A): $(RTS_DEPENDENCIES_64)
 	$(RTS_RELEASE_BUILD_64)
 	cp $(RTS_RELEASE_TARGET_64) $@
@@ -235,6 +241,10 @@ $(RTS_RUST_WASM_64_A): $(RTS_DEPENDENCIES_64)
 $(RTS_RUST_DEBUG_WASM_64_A): $(RTS_DEPENDENCIES_64)
 	$(RTS_DEBUG_BUILD_64)
 	cp $(RTS_DEBUG_TARGET_64) $@
+
+$(RTS_RUST_COMPACT_WASM_64_A): $(RTS_DEPENDENCIES_64)
+	$(RTS_COMPACT_BUILD_64)
+	cp $(RTS_COMPACT_TARGET_64) $@
 
 #
 # The test suite
@@ -354,6 +364,12 @@ mo-rts-incremental-debug.wasm: $(RTS_RUST_INCREMENTAL_DEBUG_WASM_32_A) $(WASM_A_
 	wasm-validate $@
 
 mo-rts-eop.wasm: $(RTS_RUST_WASM_64_A) $(WASM_A_DEPENDENCIES_64)
+	$(WASM_LD) -o $@ \
+	  $(LINKER_OPTIONS_64) \
+	  $+
+	wasm-validate --enable-memory64 $@
+
+mo-rts-eop-compact.wasm: $(RTS_RUST_COMPACT_WASM_64_A) $(WASM_A_DEPENDENCIES_64)
 	$(WASM_LD) -o $@ \
 	  $(LINKER_OPTIONS_64) \
 	  $+

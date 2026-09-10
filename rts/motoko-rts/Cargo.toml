@@ -34,6 +34,11 @@ classical_persistence = ["libc"]
 # Enhanced orthogonal persistence, 64-bit, retaining the main memory across upgrades.
 enhanced_orthogonal_persistence = ["incremental_gc"]
 
+# Smaller garbage-collector partitions, for hosts that run many small instances in one
+# process and pay for committed memory per instance. See PARTITION_SIZE in
+# gc/incremental/partitioned_heap.rs for the tradeoff. Orthogonal to the persistence mode.
+compact_partitions = []
+
 [dependencies]
 libc = { version = "0.2.139", default-features = false, optional = true }
 libm = "=0.2.16"
