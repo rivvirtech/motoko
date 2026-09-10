@@ -138,11 +138,11 @@
     "motoko-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1788343080,
-        "narHash": "sha256-QuvhQiFD2DsFl0NS11+jy/wy8WQNyG9iAtp8icS57VQ=",
+        "lastModified": 1788955182,
+        "narHash": "sha256-KWgjPwXSisGTrsNiyXyUNzTpn1cBsv1FkMTPyFSt+d8=",
         "owner": "caffeinelabs",
         "repo": "motoko-core",
-        "rev": "79c84db3f95dafcf616eb488d9575b0d7229bbe7",
+        "rev": "bc1bacdde08f922c77ef30ea641393cc2a57df60",
         "type": "github"
       },
       "original": {
