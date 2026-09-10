@@ -1,3 +1,4 @@
+//ENHANCED-ORTHOGONAL-PERSISTENCE-ONLY
 // Fixed-width arithmetic for Nat128.
 // Expected values computed independently in arbitrary precision, not taken from moc.
 //MOC-FLAG -A=M0194,M0198

@@ -2407,6 +2407,18 @@ and infer_exp_wrapper inf f env exp : T.typ =
   if not env.pre then begin
     let t'' = T.normalize t' in
     assert (t'' <> T.Pre);
+    (* The wide naturals are compiled only by the enhanced-orthogonal-persistence backend.
+       Refuse every user expression of such a type under --legacy-persistence here, so the
+       classical backend never meets one. The builtins define the conversions and printers
+       and are exempt: they are only ever instantiated by user code, which this catches. *)
+    (match t'' with
+     | T.Prim (T.Nat128 | T.Nat256)
+       when not !Flags.enhanced_orthogonal_persistence
+         && not (List.mem Source.(exp.at.left.file) ["prelude"; "internals"; "prim"]) ->
+       local_error env exp.at "M0271"
+         "type %s requires enhanced orthogonal persistence and is not available with --legacy-persistence"
+         (T.string_of_typ t'')
+     | _ -> ());
     let note_eff = A.infer_effect_exp exp in
     exp.note <- {note_typ = t''; note_eff}
   end;

@@ -223,6 +223,7 @@ let error_codes : (string * string option) list =
     "M0263", None; (* Migration function requires a stable variable that the previous version does not provide *)
     "M0264", None; (* mixin include requires system capability *)
     "M0267", None; (* Initial actor or chain resume point requires field; the baseline does not explain it (e.g. added with no migration) *)
+    "M0271", Some([%blob "lang_utils/error_codes/M0271.md"]); (* Nat128/Nat256 need enhanced orthogonal persistence *)
   ]
 
 (** Message codes that can be both used as warnings and errors *)

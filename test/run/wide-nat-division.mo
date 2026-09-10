@@ -1,3 +1,4 @@
+//ENHANCED-ORTHOGONAL-PERSISTENCE-ONLY
 // Division for Nat128/Nat256, aimed at the cases the algorithm can actually get wrong.
 // Expected values computed independently in arbitrary precision, not taken from moc.
 //MOC-FLAG -A=M0194,M0198

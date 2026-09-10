@@ -21,6 +21,8 @@
     between `Nat`, `Nat128` and `Nat256` is rejected rather than silently reinterpreting the
     stored value.
 
+    They are compiled by the enhanced-orthogonal-persistence backend only; a program that uses them under `--legacy-persistence` is rejected with the new error **M0271**.
+
 ## 1.16.0 (2026-09-09)
 
 * motoko (`moc`)

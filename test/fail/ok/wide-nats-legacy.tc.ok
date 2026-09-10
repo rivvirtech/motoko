@@ -1,0 +1,3 @@
+wide-nats-legacy.mo:4.5-4.15: type error [M0271], type Nat256 requires enhanced orthogonal persistence and is not available with --legacy-persistence
+wide-nats-legacy.mo:5.5-5.15: type error [M0271], type Nat128 requires enhanced orthogonal persistence and is not available with --legacy-persistence
+wide-nats-legacy.mo:6.31-6.32: type error [M0271], type Nat256 requires enhanced orthogonal persistence and is not available with --legacy-persistence
