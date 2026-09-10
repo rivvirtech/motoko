@@ -1,3 +1,4 @@
+//ENHANCED-ORTHOGONAL-PERSISTENCE-ONLY
 // Fixed-width naturals wider than a machine word must survive an upgrade with their values
 // intact. Mirrors upgrade-bignums.mo, which does the same for the arbitrary-precision types.
 //

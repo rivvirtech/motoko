@@ -20,6 +20,9 @@
     distinct from `Nat` and from each other, so an upgrade that changes a stable variable
     between `Nat`, `Nat128` and `Nat256` is rejected rather than silently reinterpreting the
     stored value.
+
+
+    They are compiled by the enhanced-orthogonal-persistence backend only; a program that uses them under `--legacy-persistence` is rejected with the new error **M0271**.
 ## 1.14.1 (2026-08-17)
 
 * motoko (`moc`)
