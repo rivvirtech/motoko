@@ -37,10 +37,14 @@ Last environment:
 @mut_array_put = <func>
 @mut_array_size = <func>
 @mut_array_vals = <func>
+@nat128ToNat = <func>
 @nat16ToNat = <func>
+@nat256ToNat = <func>
 @nat32ToNat = <func>
 @nat64ToNat = <func>
 @nat8ToNat = <func>
+@natToNat128 = <func>
+@natToNat256 = <func>
 @new_async = <func>
 @nextExpiration = <func>
 @prune = <func>
@@ -63,7 +67,9 @@ Last environment:
 @text_of_Int64 = <func>
 @text_of_Int8 = <func>
 @text_of_Nat = <func>
+@text_of_Nat128 = <func>
 @text_of_Nat16 = <func>
+@text_of_Nat256 = <func>
 @text_of_Nat32 = <func>
 @text_of_Nat64 = <func>
 @text_of_Nat8 = <func>
